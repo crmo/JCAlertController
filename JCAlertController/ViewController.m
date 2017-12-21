@@ -12,7 +12,12 @@
 
 #define identifier @"identifier"
 #define longTitle @"I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title I am title "
-#define longMessage @"I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content I am content "
+#define longMessage @"大家好：\n\
+  因接到华为官方的通知，华为官方将在这个月15号（2017年12月15日）全面停用旧的推送服务（实际已在12号就停用了旧的推送服务），全面启用新的华为推送服务。又因，M3客户端在华为设备上使用的是华为的推送服务，而这次的华为推送服务的更新，将直接影响到M3客户端在华为设备是的离线消息推送功能。（目前已接到很多客户反馈华为无法收到离线消息的问题）\n\
+  而华为突如其来的更新，M3开发这边也没能及时的得到华为官方的反馈。并且，新的服务更新也同时影响到华为推送的API，导致原华为官方API全部不能使用，需要使用新的华为官方API对M3华为推送服务端进行重新开发。\n\
+因此，对于客户现在反馈华为设备无法收到离线推送消息的问题，做出相关解释。大家好：\n\
+因接到华为官方的通知，华为官方将在这个月15号（2017年12月15日）全面停用旧的推送服务（实际已在12号就停用了旧的推送服务），全面启用新的华为推送服务。又因，M3客户端在华为设备上使用的是华为的推送服务，而这次的华为推送服务的更新，将直接影响到M3客户端在华为设备是的离线消息推送功能。（目前已接到很多客户反馈华为无法收到离线消息的问题）\n\
+"
 
 @interface ViewController ()
 
@@ -151,7 +156,11 @@
 
 - (void)contentWordsOverflow {
     JCAlertController *alert = [JCAlertController alertWithTitle:@"I am title" message:longMessage];
-    [alert addButtonWithTitle:@"OK" type:JCButtonTypeNormal clicked:nil];
+    __weak JCAlertController *weakAlert = alert;
+    [alert addButtonWithTitle:@"忽略" type:JCButtonTypeNormal clicked:^{
+        [weakAlert dismissViewControllerAnimated:YES completion:nil];
+    }];
+    [alert addButtonWithTitle:@"立即查看" type:JCButtonTypeNormal clicked:nil];
     [self jc_presentViewController:alert presentCompletion:nil dismissCompletion:nil];
 }
 
@@ -240,8 +249,9 @@
     contentView.userInteractionEnabled = YES;
     
     // pass the contentView
-    JCAlertController *alert = [JCAlertController alertWithTitle:nil contentView:contentView];
+    JCAlertController *alert = [JCAlertController alertWithTitle:@"sssss" contentView:contentView];
     [self jc_presentViewController:alert presentCompletion:nil dismissCompletion:nil];
+    [alert addButtonWithTitle:@"OK" type:JCButtonTypeNormal clicked:nil];
     
     // avoid retain circle
     __weak JCAlertController *weakAlert = alert;

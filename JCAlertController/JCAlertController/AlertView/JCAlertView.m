@@ -28,15 +28,8 @@
     
     JCAlertStyle *style = self.style;
     
-    UIEdgeInsets titleInsets = style.title.insets;
-    if (self.title && self.title.length > 0 && (!self.message || self.message.length == 0) && !self.contentView) {
-        titleInsets = style.title.onlyTitleInsets;
-    }
-    
-    UIEdgeInsets messageInsets = style.content.insets;
-    if (self.message && self.message.length > 0 && (!self.title || self.title.length == 0)) {
-        messageInsets = style.content.onlyMessageInsets;
-    }
+    UIEdgeInsets titleInsets = [self titleInsetsWithStyle:style];
+    UIEdgeInsets messageInsets = [self messageInsetsWithStyle:style];
     
     // button height
     self.buttonHeight = self.buttonItems.count > 0 ? style.buttonNormal.height : 0;
@@ -50,50 +43,13 @@
         titleHeight = titleSize.height + titleInsets.top + titleInsets.bottom;
     }
     
-    // title one line height
-    NSAttributedString *titleChar = [[NSAttributedString alloc] initWithString:@" " attributes:@{NSFontAttributeName:style.title.font}];
-    CGFloat titleCharHeight = [titleChar sizeWithMaxWidth:self.frame.size.width].height;
-    
     // if has contentView
     if (self.contentView) {
         CGFloat totalHeight = titleHeight + self.contentView.frame.size.height + self.buttonHeight;
         CGFloat alertHeight = totalHeight > self.style.alertView.maxHeight ? self.style.alertView.maxHeight : totalHeight;
         self.frame = CGRectMake(0, 0, style.alertView.width, alertHeight);
         
-        if (titleHeight > 0) {
-            if (titleSize.height <= titleCharHeight) { // show in center
-                UILabel *titleView = [[UILabel alloc] initWithFrame:CGRectIntegral(CGRectMake(titleInsets.left, titleInsets.top, style.alertView.width - titleInsets.left - titleInsets.right, titleCharHeight))];
-                titleView.text = self.title;
-                titleView.font = style.title.font;
-                titleView.textColor = style.title.textColor;
-                titleView.backgroundColor = [UIColor clearColor];
-                titleView.textAlignment = NSTextAlignmentCenter;
-                
-                UIView *bgView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, style.alertView.width, titleHeight)];
-                bgView.backgroundColor = style.title.backgroundColor;
-                [bgView addSubview:titleView];
-                
-                [self addSubview:bgView];
-            } else { // break line use textview
-                UITextView *titleView = [[UITextView alloc] initWithFrame:CGRectMake(0, 0, style.alertView.width, titleHeight)];
-                titleView.textContainerInset = titleInsets;
-                titleView.text = self.title;
-                titleView.font = style.title.font;
-                titleView.textColor = style.title.textColor;
-                titleView.backgroundColor = style.title.backgroundColor;
-                titleView.editable = NO;
-                titleView.selectable = NO;
-                titleView.scrollEnabled = YES;
-                // because contentsize.height < frame.size.height
-                if (titleView.frame.size.height < titleView.contentSize.height) {
-                    CGRect newF = titleView.frame;
-                    newF.size.height = titleView.contentSize.height;
-                    titleView.frame = newF;
-                }
-                titleView.scrollEnabled = NO;
-                [self addSubview:titleView];
-            }
-        }
+        [self setupTitle];
         
         CGRect contentFrame = self.contentView.frame;
         contentFrame.origin.y = titleHeight;
@@ -149,40 +105,7 @@
     
     // layout
     if (titleHeight + contentHeight + self.buttonHeight < style.alertView.maxHeight) { // in max height
-        if (titleHeight > 0) {
-            if (titleSize.height <= titleCharHeight) { // show in center
-                UILabel *titleView = [[UILabel alloc] initWithFrame:CGRectIntegral(CGRectMake(titleInsets.left, titleInsets.top, style.alertView.width - titleInsets.left - titleInsets.right, titleCharHeight))];
-                titleView.text = self.title;
-                titleView.font = style.title.font;
-                titleView.textColor = style.title.textColor;
-                titleView.backgroundColor = [UIColor clearColor];
-                titleView.textAlignment = NSTextAlignmentCenter;
-                
-                UIView *bgView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, style.alertView.width, titleHeight)];
-                bgView.backgroundColor = style.title.backgroundColor;
-                [bgView addSubview:titleView];
-                
-                [self addSubview:bgView];
-            } else {
-                UITextView *titleView = [[UITextView alloc] initWithFrame:CGRectMake(0, 0, style.alertView.width, titleHeight)];
-                titleView.text = self.title;
-                titleView.font = style.title.font;
-                titleView.textContainerInset = titleInsets;
-                titleView.textColor = style.title.textColor;
-                titleView.backgroundColor = style.title.backgroundColor;
-                titleView.editable = NO;
-                titleView.selectable = NO;
-                titleView.scrollEnabled = YES;
-                // because contentsize.height < frame.size.height
-                if (titleView.frame.size.height < titleView.contentSize.height) {
-                    CGRect newF = titleView.frame;
-                    newF.size.height = titleView.contentSize.height;
-                    titleView.frame = newF;
-                }
-                titleView.scrollEnabled = NO;
-                [self addSubview:titleView];
-            }
-        }
+        [self setupTitle];
         
         if (contentHeight > 0) {
             if (contentSize.height <= contentCharHeight) {
@@ -234,46 +157,20 @@
 
             [self setupButton];
         } else { // content scrollable
-            if (titleHeight > 0) {
-                if (titleSize.height <= titleCharHeight) { // show in center
-                    UILabel *titleView = [[UILabel alloc] initWithFrame:CGRectIntegral(CGRectMake(titleInsets.left, titleInsets.top, style.alertView.width - titleInsets.left - titleInsets.right, titleCharHeight))];
-                    titleView.text = self.title;
-                    titleView.font = style.title.font;
-                    titleView.textColor = style.title.textColor;
-                    titleView.backgroundColor = [UIColor clearColor];
-                    titleView.textAlignment = NSTextAlignmentCenter;
-                    
-                    UIView *bgView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, style.alertView.width, titleHeight)];
-                    bgView.backgroundColor = style.title.backgroundColor;
-                    [bgView addSubview:titleView];
-                    
-                    [self addSubview:bgView];
-                } else { 
-                    UITextView *titleView = [[UITextView alloc] initWithFrame:CGRectMake(0, 0, style.alertView.width, titleHeight)];
-                    titleView.textContainerInset = titleInsets;
-                    titleView.text = self.title;
-                    titleView.font = style.title.font;
-                    titleView.textColor = style.title.textColor;
-                    titleView.backgroundColor = style.title.backgroundColor;
-                    titleView.editable = NO;
-                    titleView.selectable = NO;
-                    titleView.scrollEnabled = YES;
-                    // because contentsize.height < frame.size.height
-                    if (titleView.frame.size.height < titleView.contentSize.height) {
-                        CGRect newF = titleView.frame;
-                        newF.size.height = titleView.contentSize.height;
-                        titleView.frame = newF;
-                    }
-                    titleView.scrollEnabled = NO;
-                    [self addSubview:titleView];
-                }
-            }
+            [self setupTitle];
             
             UITextView *contentView = [[UITextView alloc] initWithFrame:CGRectMake(0, titleHeight, style.alertView.width, maxUnstretchTitleHeight - titleHeight)];
             contentView.textContainerInset = messageInsets;
-            contentView.text = self.message;
-            contentView.font = style.content.font;
-            contentView.textColor = style.content.textColor;
+            NSMutableAttributedString *attributedStr = [[NSMutableAttributedString alloc] initWithString:self.message];
+            [attributedStr addAttribute:NSFontAttributeName value:style.content.font range:NSMakeRange(0, self.message.length)];
+            [attributedStr addAttribute:NSStrokeColorAttributeName value:style.content.textColor range:NSMakeRange(0, self.message.length)];
+            NSMutableParagraphStyle * paragraphStyle = [[NSMutableParagraphStyle alloc] init];
+            [paragraphStyle setLineSpacing:5]; // 行间距
+            [attributedStr addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:NSMakeRange(0, self.message.length)];
+            contentView.attributedText = attributedStr;
+//            contentView.text = self.message;
+//            contentView.font = style.content.font;
+//            contentView.textColor = style.content.textColor;
             contentView.backgroundColor = style.content.backgroundColor;
             contentView.editable = NO;
             contentView.selectable = NO;
@@ -290,6 +187,81 @@
     }
     
     self.center = newSuperview.center;
+}
+
+- (void)setupTitle {
+    JCAlertStyle *style = self.style;
+    UIEdgeInsets titleInsets = [self titleInsetsWithStyle:style];
+    
+    // cal title height
+    CGFloat titleHeight = 0;
+    CGSize titleSize = CGSizeZero;
+    if (self.title.length > 0) {
+        NSAttributedString *titleStr = [[NSAttributedString alloc] initWithString:self.title attributes:@{NSFontAttributeName:style.title.font}];
+        titleSize = [titleStr sizeWithMaxWidth:style.alertView.width - titleInsets.left - titleInsets.right];
+        titleHeight = titleSize.height + titleInsets.top + titleInsets.bottom;
+    }
+    
+    // title one line height
+    NSAttributedString *titleChar = [[NSAttributedString alloc] initWithString:@" " attributes:@{NSFontAttributeName:style.title.font}];
+    CGFloat titleCharHeight = [titleChar sizeWithMaxWidth:self.frame.size.width].height;
+    if (titleHeight > 0) {
+        if (titleSize.height <= titleCharHeight) { // show in center
+            UIImageView *titleIcon = [[UIImageView alloc] initWithFrame:CGRectMake(titleInsets.left, titleInsets.top, 28, 28)];
+            titleIcon.image = [UIImage imageNamed:@"smart_message_title_icon"];
+            UILabel *titleView = [[UILabel alloc] initWithFrame:CGRectIntegral(CGRectMake(titleInsets.left + CGRectGetMaxX(titleIcon.frame), titleInsets.top, style.alertView.width - titleInsets.left - titleInsets.right, CGRectGetHeight(titleIcon.frame)))];
+            titleView.text = self.title;
+            titleView.font = self.style.title.font;
+            titleView.textColor = self.style.title.textColor;
+            titleView.backgroundColor = [UIColor clearColor];
+            titleView.textAlignment = NSTextAlignmentLeft;
+            
+            UIView *bgView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, style.alertView.width, titleHeight)];
+            bgView.backgroundColor = style.title.backgroundColor;
+            [bgView addSubview:titleIcon];
+            [bgView addSubview:titleView];
+            
+            [self addSubview:bgView];
+        } else { // break line use textview
+            UITextView *titleView = [[UITextView alloc] initWithFrame:CGRectMake(0, 0, style.alertView.width, titleHeight)];
+            titleView.textContainerInset = titleInsets;
+            titleView.text = self.title;
+            titleView.font = style.title.font;
+            titleView.textColor = style.title.textColor;
+            titleView.backgroundColor = style.title.backgroundColor;
+            titleView.editable = NO;
+            titleView.selectable = NO;
+            titleView.scrollEnabled = YES;
+            // because contentsize.height < frame.size.height
+            if (titleView.frame.size.height < titleView.contentSize.height) {
+                CGRect newF = titleView.frame;
+                newF.size.height = titleView.contentSize.height;
+                titleView.frame = newF;
+            }
+            titleView.scrollEnabled = NO;
+            [self addSubview:titleView];
+        }
+    }
+    
+    UIView *separator = [[UIView alloc] initWithFrame:CGRectMake(0, titleHeight - style.separator.width, CGRectGetWidth(self.frame), style.separator.width)];
+    separator.backgroundColor = style.separator.color;
+    [self addSubview:separator];
+}
+
+- (UIEdgeInsets)titleInsetsWithStyle:(JCAlertStyle *)style {
+    UIEdgeInsets titleInsets = style.title.insets;
+    if (self.title && self.title.length > 0 && (!self.message || self.message.length == 0) && !self.contentView) {
+        titleInsets = style.title.onlyTitleInsets;
+    }
+    return titleInsets;
+}
+
+- (UIEdgeInsets)messageInsetsWithStyle:(JCAlertStyle *)style {
+    UIEdgeInsets messageInsets = style.content.insets;
+    if (self.message && self.message.length > 0 && (!self.title || self.title.length == 0)) {
+        messageInsets = style.content.onlyMessageInsets;
+    }
+    return messageInsets;
 }
 
 - (void)setupButton {

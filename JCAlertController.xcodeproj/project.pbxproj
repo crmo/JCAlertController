@@ -24,6 +24,9 @@
 		03A99E221E98066B009BC03D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 03A99E201E98066B009BC03D /* LaunchScreen.storyboard */; };
 		03A99E2D1E98066B009BC03D /* JCAlertControllerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 03A99E2C1E98066B009BC03D /* JCAlertControllerTests.m */; };
 		03A99E381E98066B009BC03D /* JCAlertControllerUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = 03A99E371E98066B009BC03D /* JCAlertControllerUITests.m */; };
+		17C9E45E1FEBC6D600E73FCE /* smart_message_title_icon@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 17C9E45B1FEBC6D600E73FCE /* smart_message_title_icon@3x.png */; };
+		17C9E45F1FEBC6D600E73FCE /* smart_message_title_icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 17C9E45C1FEBC6D600E73FCE /* smart_message_title_icon.png */; };
+		17C9E4601FEBC6D600E73FCE /* smart_message_title_icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 17C9E45D1FEBC6D600E73FCE /* smart_message_title_icon@2x.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -79,6 +82,9 @@
 		03A99E331E98066B009BC03D /* JCAlertControllerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = JCAlertControllerUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		03A99E371E98066B009BC03D /* JCAlertControllerUITests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = JCAlertControllerUITests.m; sourceTree = "<group>"; };
 		03A99E391E98066B009BC03D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		17C9E45B1FEBC6D600E73FCE /* smart_message_title_icon@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "smart_message_title_icon@3x.png"; sourceTree = "<group>"; };
+		17C9E45C1FEBC6D600E73FCE /* smart_message_title_icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = smart_message_title_icon.png; sourceTree = "<group>"; };
+		17C9E45D1FEBC6D600E73FCE /* smart_message_title_icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "smart_message_title_icon@2x.png"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -186,6 +192,9 @@
 		03A99E111E98066B009BC03D /* JCAlertController */ = {
 			isa = PBXGroup;
 			children = (
+				17C9E45C1FEBC6D600E73FCE /* smart_message_title_icon.png */,
+				17C9E45D1FEBC6D600E73FCE /* smart_message_title_icon@2x.png */,
+				17C9E45B1FEBC6D600E73FCE /* smart_message_title_icon@3x.png */,
 				030C7A6E1E9CF3C200B822C1 /* JCAlertController */,
 				03A99E151E98066B009BC03D /* AppDelegate.h */,
 				03A99E161E98066B009BC03D /* AppDelegate.m */,
@@ -336,6 +345,9 @@
 			files = (
 				03A99E221E98066B009BC03D /* LaunchScreen.storyboard in Resources */,
 				03A99E1F1E98066B009BC03D /* Assets.xcassets in Resources */,
+				17C9E45E1FEBC6D600E73FCE /* smart_message_title_icon@3x.png in Resources */,
+				17C9E45F1FEBC6D600E73FCE /* smart_message_title_icon.png in Resources */,
+				17C9E4601FEBC6D600E73FCE /* smart_message_title_icon@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
