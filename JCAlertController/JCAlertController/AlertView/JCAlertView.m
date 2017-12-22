@@ -24,6 +24,10 @@
 - (void)willMoveToSuperview:(UIView *)newSuperview {
     [super willMoveToSuperview:newSuperview];
     
+    if (!newSuperview) {
+        return;
+    }
+    
     self.backgroundColor = [UIColor clearColor];
     
     JCAlertStyle *style = self.style;
@@ -46,7 +50,7 @@
     // if has contentView
     if (self.contentView) {
         CGFloat totalHeight = titleHeight + self.contentView.frame.size.height + self.buttonHeight;
-        CGFloat alertHeight = totalHeight > self.style.alertView.maxHeight ? self.style.alertView.maxHeight : totalHeight;
+        CGFloat alertHeight = totalHeight > style.alertView.maxHeight ? style.alertView.maxHeight : totalHeight;
         self.frame = CGRectMake(0, 0, style.alertView.width, alertHeight);
         
         [self setupTitle];
@@ -54,12 +58,13 @@
         CGRect contentFrame = self.contentView.frame;
         contentFrame.origin.y = titleHeight;
         
-        if (CGRectGetHeight(contentFrame) > self.style.alertView.maxHeight) {
+        CGFloat maxContentViewHeight = style.alertView.maxHeight - titleHeight - self.buttonHeight;
+        if (CGRectGetHeight(contentFrame) > maxContentViewHeight) {
             CGRect scrollFrame = contentFrame;
-            scrollFrame.size.height = self.style.alertView.maxHeight - titleHeight - self.buttonHeight;
+            scrollFrame.size.height = maxContentViewHeight;
             UIScrollView *contentScrollView = [[UIScrollView alloc] initWithFrame:scrollFrame];
             contentScrollView.contentSize = contentFrame.size;
-            contentScrollView.backgroundColor = self.style.alertView.backgroundColor;
+            contentScrollView.backgroundColor = style.alertView.backgroundColor;
             [contentScrollView addSubview:self.contentView];
             [self addSubview:contentScrollView];
         } else {
@@ -211,8 +216,8 @@
             titleIcon.image = [UIImage imageNamed:@"smart_message_title_icon"];
             UILabel *titleView = [[UILabel alloc] initWithFrame:CGRectIntegral(CGRectMake(titleInsets.left + CGRectGetMaxX(titleIcon.frame), titleInsets.top, style.alertView.width - titleInsets.left - titleInsets.right, CGRectGetHeight(titleIcon.frame)))];
             titleView.text = self.title;
-            titleView.font = self.style.title.font;
-            titleView.textColor = self.style.title.textColor;
+            titleView.font = style.title.font;
+            titleView.textColor = style.title.textColor;
             titleView.backgroundColor = [UIColor clearColor];
             titleView.textAlignment = NSTextAlignmentLeft;
             
@@ -275,7 +280,7 @@
             } else if (leftItem.type == JCButtonTypeWarning) {
                 styleButton = style.buttonWarning;
             }
-            CGFloat alertHeight = (self.frame.size.height > self.style.alertView.maxHeight) ? self.style.alertView.maxHeight : self.frame.size.height;
+            CGFloat alertHeight = (self.frame.size.height > style.alertView.maxHeight) ? style.alertView.maxHeight : self.frame.size.height;
             UIButton *leftBtn = [[UIButton alloc] initWithFrame:CGRectMake(0, alertHeight - self.buttonHeight, style.alertView.width / 2, self.buttonHeight)];
             leftBtn.userInteractionEnabled = NO;
             [leftBtn setTitle:leftItem.title forState:UIControlStateNormal];
