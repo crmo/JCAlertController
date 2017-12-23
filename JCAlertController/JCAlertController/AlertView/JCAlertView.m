@@ -107,10 +107,6 @@
         contentHeight = contentSize.height + messageInsets.top + messageInsets.bottom;
     }
     
-    // content one line height
-    NSAttributedString *contentChar = [[NSAttributedString alloc] initWithString:@" " attributes:@{NSFontAttributeName:style.content.font}];
-    CGFloat contentCharHeight = [contentChar sizeWithMaxWidth:self.frame.size.width].height;
-    
     // give alert frame
     if (titleHeight + contentHeight + self.buttonHeight > style.alertView.maxHeight) {
         self.frame = CGRectMake(0, 0, style.alertView.width, style.alertView.maxHeight);
@@ -123,37 +119,39 @@
         [self setupTitle];
         
         if (contentHeight > 0) {
-            if (contentSize.height <= contentCharHeight) {
-                UILabel *contentView = [[UILabel alloc] initWithFrame:CGRectMake(messageInsets.left, messageInsets.top, style.alertView.width - messageInsets.left - messageInsets.right, contentCharHeight)];
-                contentView.attributedText = contentStr;
-                contentView.backgroundColor = [UIColor clearColor];
-                contentView.textAlignment = NSTextAlignmentCenter;
+            UITextView *contentView = [[UITextView alloc] initWithFrame:CGRectMake(0, titleHeight, style.alertView.width, contentHeight)];
+            contentView.textContainerInset = messageInsets;
+            contentView.attributedText = contentStr;
+            contentView.backgroundColor = style.content.backgroundColor;
+            contentView.editable = NO;
+            contentView.selectable = NO;
+            contentView.scrollEnabled = YES;
+            // because contentsize.height < frame.size.height
+            BOOL canScroll = NO;
+            if (contentView.frame.size.height < contentView.contentSize.height) {
+                CGFloat maxContentHeight = style.alertView.maxHeight - titleHeight - _buttonHeight;
+                CGRect newContentFrame = contentView.frame;
+                if (contentView.contentSize.height > maxContentHeight) {
+                    newContentFrame.size.height = maxContentHeight;
+                } else {
+                    newContentFrame.size.height = contentView.contentSize.height;
+                }
+                contentView.frame = newContentFrame;
                 
-                UIView *bgView = [[UIView alloc] initWithFrame:CGRectMake(0, titleHeight, style.alertView.width, contentHeight)];
-                bgView.backgroundColor = style.content.backgroundColor;
-                [bgView addSubview:contentView];
+                CGRect newAlertFrame = self.frame;
+                CGFloat newAlertHeight = titleHeight + contentView.contentSize.height + _buttonHeight;
                 
-                [self addSubview:bgView];
-            } else {
-                UITextView *contentView = [[UITextView alloc] initWithFrame:CGRectMake(0, titleHeight, style.alertView.width, contentHeight)];
-                contentView.textContainerInset = messageInsets;
-                contentView.attributedText = contentStr;
-                contentView.backgroundColor = style.content.backgroundColor;
-                contentView.editable = NO;
-                contentView.selectable = NO;
-                contentView.scrollEnabled = YES;
-                // because contentsize.height < frame.size.height
-//                if (contentView.frame.size.height < contentView.contentSize.height) {
-//                    CGRect newF = contentView.frame;
-//                    newF.size.height = contentView.contentSize.height;
-//                    contentView.frame = newF;
-//                    CGRect newFrame = self.frame;
-//                    newFrame.size.height = titleHeight + contentView.contentSize.height + _buttonHeight;
-//                    self.frame = newFrame;
-//                }
-                contentView.scrollEnabled = NO;
-                [self addSubview:contentView];
+                if (newAlertHeight > style.alertView.maxHeight) {
+                    newAlertFrame.size.height = style.alertView.maxHeight;
+                    canScroll = YES;
+                } else {
+                    newAlertFrame.size.height = titleHeight + contentView.contentSize.height + _buttonHeight;
+                    canScroll = NO;
+                }
+                self.frame = newAlertFrame;
             }
+            contentView.scrollEnabled = canScroll;
+            [self addSubview:contentView];
         }
 
         [self setupButton];
