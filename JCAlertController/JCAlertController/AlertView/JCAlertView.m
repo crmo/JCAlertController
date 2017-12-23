@@ -59,17 +59,20 @@
         contentFrame.origin.y = titleHeight;
         
         CGFloat maxContentViewHeight = style.alertView.maxHeight - titleHeight - self.buttonHeight;
-        if (CGRectGetHeight(contentFrame) > maxContentViewHeight) {
-            CGRect scrollFrame = contentFrame;
-            scrollFrame.size.height = maxContentViewHeight;
-            UIScrollView *contentScrollView = [[UIScrollView alloc] initWithFrame:scrollFrame];
-            contentScrollView.contentSize = contentFrame.size;
-            contentScrollView.backgroundColor = style.alertView.backgroundColor;
-            [contentScrollView addSubview:self.contentView];
-            [self addSubview:contentScrollView];
-        } else {
-            self.contentView.frame = contentFrame;
-            [self addSubview:self.contentView];
+        
+        if (maxContentViewHeight > 0) {
+            if (CGRectGetHeight(contentFrame) > maxContentViewHeight) {
+                CGRect scrollFrame = contentFrame;
+                scrollFrame.size.height = maxContentViewHeight;
+                UIScrollView *contentScrollView = [[UIScrollView alloc] initWithFrame:scrollFrame];
+                contentScrollView.contentSize = contentFrame.size;
+                contentScrollView.backgroundColor = style.alertView.backgroundColor;
+                [contentScrollView addSubview:self.contentView];
+                [self addSubview:contentScrollView];
+            } else {
+                self.contentView.frame = contentFrame;
+                [self addSubview:self.contentView];
+            }
         }
         
         [self setupButton];
@@ -91,8 +94,15 @@
     // cal content height
     CGFloat contentHeight = 0;
     CGSize contentSize = CGSizeZero;
+    NSMutableAttributedString *contentStr = nil;
     if (self.message.length > 0) {
-        NSAttributedString *contentStr = [[NSAttributedString alloc] initWithString:self.message attributes:@{NSFontAttributeName:style.content.font}];
+        contentStr = [[NSMutableAttributedString alloc] initWithString:self.message];
+        [contentStr addAttribute:NSFontAttributeName value:style.content.font range:NSMakeRange(0, self.message.length)];
+        [contentStr addAttribute:NSForegroundColorAttributeName value:[UIColor blackColor] range:NSMakeRange(0, self.message.length)];
+        [contentStr addAttribute:NSStrokeColorAttributeName value:style.content.textColor range:NSMakeRange(0, self.message.length)];
+        NSMutableParagraphStyle * paragraphStyle = [[NSMutableParagraphStyle alloc] init];
+        [paragraphStyle setLineSpacing:5]; // 行间距
+        [contentStr addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:NSMakeRange(0, self.message.length)];
         contentSize = [contentStr sizeWithMaxWidth:style.alertView.width - messageInsets.left - messageInsets.right];
         contentHeight = contentSize.height + messageInsets.top + messageInsets.bottom;
     }
@@ -115,9 +125,7 @@
         if (contentHeight > 0) {
             if (contentSize.height <= contentCharHeight) {
                 UILabel *contentView = [[UILabel alloc] initWithFrame:CGRectMake(messageInsets.left, messageInsets.top, style.alertView.width - messageInsets.left - messageInsets.right, contentCharHeight)];
-                contentView.text = self.message;
-                contentView.font = style.content.font;
-                contentView.textColor = style.content.textColor;
+                contentView.attributedText = contentStr;
                 contentView.backgroundColor = [UIColor clearColor];
                 contentView.textAlignment = NSTextAlignmentCenter;
                 
@@ -129,19 +137,20 @@
             } else {
                 UITextView *contentView = [[UITextView alloc] initWithFrame:CGRectMake(0, titleHeight, style.alertView.width, contentHeight)];
                 contentView.textContainerInset = messageInsets;
-                contentView.text = self.message;
-                contentView.font = style.content.font;
-                contentView.textColor = style.content.textColor;
+                contentView.attributedText = contentStr;
                 contentView.backgroundColor = style.content.backgroundColor;
                 contentView.editable = NO;
                 contentView.selectable = NO;
                 contentView.scrollEnabled = YES;
                 // because contentsize.height < frame.size.height
-                if (contentView.frame.size.height < contentView.contentSize.height) {
-                    CGRect newF = contentView.frame;
-                    newF.size.height = contentView.contentSize.height;
-                    contentView.frame = newF;
-                }
+//                if (contentView.frame.size.height < contentView.contentSize.height) {
+//                    CGRect newF = contentView.frame;
+//                    newF.size.height = contentView.contentSize.height;
+//                    contentView.frame = newF;
+//                    CGRect newFrame = self.frame;
+//                    newFrame.size.height = titleHeight + contentView.contentSize.height + _buttonHeight;
+//                    self.frame = newFrame;
+//                }
                 contentView.scrollEnabled = NO;
                 [self addSubview:contentView];
             }
@@ -173,9 +182,6 @@
             [paragraphStyle setLineSpacing:5]; // 行间距
             [attributedStr addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:NSMakeRange(0, self.message.length)];
             contentView.attributedText = attributedStr;
-//            contentView.text = self.message;
-//            contentView.font = style.content.font;
-//            contentView.textColor = style.content.textColor;
             contentView.backgroundColor = style.content.backgroundColor;
             contentView.editable = NO;
             contentView.selectable = NO;
